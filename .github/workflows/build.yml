@@ -14,6 +14,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Show files
+        run: |
+          echo "Files in repository:"
+          ls -la
+          echo "ZIP files:"
+          find . -maxdepth 5 -name "*.zip" -type f
+
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
@@ -22,9 +29,12 @@ jobs:
 
       - name: Unzip project
         run: |
-          unzip -q "Bazel_Mama_Nadia_TeacherStyle_READY.zip" -d extracted
+          ZIP_FILE=$(find . -maxdepth 5 -name "*.zip" -type f | head -n 1)
+          echo "Using ZIP: $ZIP_FILE"
+          unzip -q "$ZIP_FILE" -d extracted
           PROJECT_DIR=$(find extracted -name "settings.gradle" -type f -printf '%h\n' | head -n 1)
           echo "PROJECT_DIR=$PROJECT_DIR" >> $GITHUB_ENV
+          echo "Project dir: $PROJECT_DIR"
 
       - name: Make Gradle executable
         run: chmod +x "$PROJECT_DIR/gradlew"
